@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Profile Picture Standards — Training Presentation</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#f5f5f5;display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px}
+.player{width:100%;max-width:720px;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 2px 24px rgba(0,0,0,0.08)}
+.stage{min-height:420px;position:relative;overflow:hidden}
+.controls{padding:14px 20px;border-top:1px solid #eee}
+.progress-bar{width:100%;height:4px;background:#e5e7eb;border-radius:2px;overflow:hidden}
+.progress-fill{height:100%;background:#3b82f6;border-radius:2px;transition:width 0.3s linear}
+.ctrl-row{display:flex;align-items:center;gap:12px;margin-top:10px}
+.play-btn{width:40px;height:40px;border-radius:50%;border:1px solid #d1d5db;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;transition:background 0.2s}
+.play-btn:hover{background:#f3f4f6}
+.scene-btns{display:flex;gap:4px;flex:1;flex-wrap:wrap}
+.scene-btn{padding:5px 10px;font-size:12px;border-radius:6px;cursor:pointer;border:1px solid #e5e7eb;background:#f9fafb;color:#6b7280;transition:all 0.2s}
+.scene-btn.active{border-color:#3b82f6;background:#eff6ff;color:#2563eb;font-weight:600}
+.scene-btn:hover{background:#f0f0f0}
+.counter{font-size:12px;color:#9ca3af;white-space:nowrap}
+.fade-in{animation:fadeIn 0.6s ease forwards}
+.slide-up{animation:slideUp 0.6s ease forwards}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.intro-bg{display:flex;flex-direction:column;align-items:center;justify-content:center;height:420px;background:linear-gradient(135deg,#1a1a2e,#16213e);color:#fff;text-align:center;padding:40px}
+.intro-title{font-size:32px;font-weight:700;margin-bottom:12px}
+.intro-sub{font-size:16px;opacity:0.65}
+.intro-line{width:60px;height:3px;background:#3b82f6;border-radius:2px;margin-top:28px}
+.scene-content{padding:28px 24px;min-height:420px;display:flex;flex-direction:column;justify-content:center}
+.narration{font-size:15px;color:#6b7280;line-height:1.7;margin-bottom:20px}
+.check-list{list-style:none}
+.check-list li{display:flex;align-items:center;gap:10px;padding:7px 0;opacity:0;transform:translateX(-15px)}
+.check-list li.show{opacity:1;transform:translateX(0);transition:all 0.4s ease}
+.check-icon{width:22px;height:22px;border-radius:50%;background:#22c55e;color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0}
+.check-text{font-size:14px;color:#1f2937}
+.good-photo-area{display:flex;gap:24px;align-items:flex-start}
+.rejected-grid{display:flex;flex-wrap:wrap;gap:14px;justify-content:center;margin-top:8px}
+.rejected-card{position:relative;border-radius:8px;overflow:hidden;opacity:0;transform:scale(0.85);transition:all 0.4s ease}
+.rejected-card.show{opacity:1;transform:scale(1)}
+.rejected-badge{position:absolute;top:6px;right:6px;width:22px;height:22px;border-radius:50%;background:#ef4444;color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700}
+.warning-box{background:#fef3c7;border:2px solid #f59e0b;border-radius:14px;padding:28px;max-width:480px;margin:0 auto;text-align:center}
+.warning-icon{font-size:32px;margin-bottom:8px}
+.warning-title{font-size:18px;font-weight:700;color:#92400e;margin-bottom:12px}
+.warning-text{font-size:14px;color:#78350f;line-height:1.65}
+.compare-row{display:flex;justify-content:center;gap:20px;margin-top:20px}
+.compare-item{text-align:center}
+.compare-circle{width:68px;height:68px;border-radius:50%;background:#e5e7eb;margin:0 auto 6px;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.compare-circle.prev{border:2.5px solid #22c55e}
+.compare-circle.new{border:2.5px solid #3b82f6}
+.compare-label{font-size:11px;color:#78350f}
+.compare-arrow{display:flex;align-items:center;font-size:22px;color:#f59e0b}
+.escalate-tag{margin-top:18px;padding:10px 20px;background:#fde68a;border-radius:8px;font-size:13px;font-weight:600;color:#92400e;display:inline-block}
+.step-row{display:flex;gap:14px;margin-bottom:22px;opacity:0;transform:translateY(12px)}
+.step-row.show{opacity:1;transform:translateY(0);transition:all 0.6s ease}
+.step-num{width:38px;height:38px;border-radius:50%;background:#3b82f6;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:17px;flex-shrink:0}
+.step-title{font-size:15px;font-weight:600;color:#1f2937;margin-bottom:4px}
+.step-desc{font-size:13px;color:#6b7280;line-height:1.6}
+.info-box{margin-top:8px;padding:12px 16px;background:#eff6ff;border-radius:8px;font-size:13px;color:#2563eb;opacity:0;transition:opacity 0.5s ease}
+.info-box.show{opacity:1}
+.recap-bg{display:flex;flex-direction:column;align-items:center;justify-content:center;height:420px;background:linear-gradient(135deg,#1a1a2e,#16213e);color:#fff;text-align:center;padding:40px}
+.recap-item{font-size:17px;margin-bottom:14px;opacity:0;transform:translateY(10px)}
+.recap-item.show{opacity:1;transform:translateY(0);transition:all 0.5s ease}
+.recap-footer{margin-top:28px;font-size:13px;opacity:0;transition:opacity 0.6s ease}
+.recap-footer.show{opacity:0.55}
+.mock-app{width:170px;flex-shrink:0;border-radius:16px;background:#f9fafb;border:1px solid #e5e7eb;padding:16px;text-align:center}
+.mock-label{font-size:11px;color:#9ca3af;font-weight:600;letter-spacing:0.5px;margin-bottom:10px}
+.mock-avatar{width:74px;height:74px;border-radius:50%;background:#e5e7eb;margin:0 auto 8px;overflow:hidden}
+.mock-name{font-size:14px;font-weight:600;color:#1f2937}
+.mock-stars{color:#f59e0b;font-size:12px;margin:4px 0}
+.mock-eta{font-size:11px;color:#9ca3af}
+.why-text{flex:1}
+.why-main{font-size:15px;color:#374151;line-height:1.7;margin-bottom:14px}
+.why-sub{font-size:14px;color:#6b7280}
+</style>
+</head>
+<body>
+
+<div class="player">
+  <div class="stage" id="stage"></div>
+  <div class="controls">
+    <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+    <div class="ctrl-row">
+      <button class="play-btn" id="playBtn" onclick="togglePlay()">▶</button>
+      <div class="scene-btns" id="sceneBtns"></div>
+      <span class="counter" id="counter">1 / 7</span>
+    </div>
+  </div>
+</div>
+
+<script>
+var SCENES=[
+  {id:"intro",dur:6000,render:renderIntro},
+  {id:"why",dur:7000,render:renderWhy},
+  {id:"good",dur:10000,render:renderChecklist},
+  {id:"bad",dur:9000,render:renderRejected},
+  {id:"identity",dur:8000,render:renderIdentity},
+  {id:"process",dur:10000,render:renderProcess},
+  {id:"recap",dur:8000,render:renderRecap}
+];
+var scene=0,playing=false,elapsed=0,timer=null,startT=0;
+var stage=document.getElementById("stage"),progressFill=document.getElementById("progressFill"),playBtn=document.getElementById("playBtn"),counter=document.getElementById("counter"),sceneBtns=document.getElementById("sceneBtns");
+
+function init(){
+  SCENES.forEach(function(s,i){
+    var b=document.createElement("button");
+    b.className="scene-btn"+(i===0?" active":"");
+    b.textContent=i+1;
+    b.onclick=function(){goTo(i)};
+    sceneBtns.appendChild(b);
+  });
+  renderScene();
+}
+
+function totalDur(){var t=0;SCENES.forEach(function(s){t+=s.dur});return t}
+function elapsedTotal(){var t=0;for(var i=0;i<scene;i++)t+=SCENES[i].dur;return t+Math.min(elapsed,SCENES[scene].dur)}
+
+function updateProgress(){
+  var p=(elapsedTotal()/totalDur())*100;
+  progressFill.style.width=p+"%";
+  counter.textContent=(scene+1)+" / "+SCENES.length;
+  var btns=sceneBtns.children;
+  for(var i=0;i<btns.length;i++){btns[i].className="scene-btn"+(i===scene?" active":"")}
+}
+
+function togglePlay(){
+  if(!playing){
+    if(scene===SCENES.length-1&&elapsed>=SCENES[scene].dur){scene=0;elapsed=0;renderScene()}
+    playing=true;playBtn.textContent="❚❚";startT=Date.now()-elapsed;
+    timer=setInterval(tick,50);
+  }else{
+    playing=false;playBtn.textContent="▶";clearInterval(timer);timer=null;
+  }
+}
+
+function tick(){
+  elapsed=Date.now()-startT;
+  if(elapsed>=SCENES[scene].dur){
+    if(scene<SCENES.length-1){scene++;elapsed=0;startT=Date.now();renderScene()}
+    else{playing=false;playBtn.textContent="▶";clearInterval(timer);timer=null;elapsed=SCENES[scene].dur}
+  }
+  updateProgress();
+  animateScene(Math.min(elapsed/SCENES[scene].dur,1));
+}
+
+function goTo(i){scene=i;elapsed=0;if(playing){startT=Date.now()}renderScene();updateProgress()}
+
+function renderScene(){stage.innerHTML="";SCENES[scene].render();animateScene(0);updateProgress()}
+
+function sp(t){return Math.min(elapsed/SCENES[scene].dur,1)>t}
+
+function animateScene(p){
+  if(SCENES[scene].id==="good"){
+    var items=stage.querySelectorAll(".check-list li");
+    items.forEach(function(el,i){if(p>(i+1)*0.09)el.classList.add("show")});
+  }
+  if(SCENES[scene].id==="bad"){
+    var cards=stage.querySelectorAll(".rejected-card");
+    cards.forEach(function(el,i){if(p>(i+1)*0.12)el.classList.add("show")});
+  }
+  if(SCENES[scene].id==="identity"){
+    var cr=stage.querySelector(".compare-row");if(cr)cr.style.opacity=p>0.35?1:0;
+    var et=stage.querySelector(".escalate-tag");if(et)et.style.opacity=p>0.65?1:0;
+  }
+  if(SCENES[scene].id==="process"){
+    var steps=stage.querySelectorAll(".step-row");
+    steps.forEach(function(el,i){if(p>(i+1)*0.25)el.classList.add("show")});
+    var ib=stage.querySelector(".info-box");if(ib&&p>0.7)ib.classList.add("show");
+  }
+  if(SCENES[scene].id==="recap"){
+    var ri=stage.querySelectorAll(".recap-item");
+    ri.forEach(function(el,i){if(p>(i+1)*0.17)el.classList.add("show")});
+    var rf=stage.querySelector(".recap-footer");if(rf&&p>0.82)rf.classList.add("show");
+  }
+}
+
+function faceSVG(w,h){
+  return '<svg viewBox="0 0 '+w+' '+h+'" width="'+w+'" height="'+h+'"><circle cx="'+(w/2)+'" cy="'+(h*0.38)+'" r="'+(w*0.24)+'" fill="#d4a574"/><ellipse cx="'+(w/2)+'" cy="'+(h*0.28)+'" rx="'+(w*0.2)+'" ry="'+(h*0.09)+'" fill="#2c1810"/><circle cx="'+(w*0.41)+'" cy="'+(h*0.38)+'" r="'+(w*0.03)+'" fill="#1a1a1a"/><circle cx="'+(w*0.59)+'" cy="'+(h*0.38)+'" r="'+(w*0.03)+'" fill="#1a1a1a"/><path d="M'+(w*0.42)+' '+(h*0.46)+' Q'+(w/2)+' '+(h*0.51)+' '+(w*0.58)+' '+(h*0.46)+'" fill="none" stroke="#1a1a1a" stroke-width="1.2"/><rect x="'+(w*0.25)+'" y="'+(h*0.57)+'" width="'+(w*0.5)+'" height="'+(h*0.33)+'" rx="4" fill="#3b82f6"/></svg>';
+}
+
+function renderIntro(){
+  stage.innerHTML='<div class="intro-bg"><div class="intro-title fade-in">Profile picture standards</div><div class="intro-sub slide-up">Training guide for document reviewers</div><div class="intro-line slide-up"></div></div>';
+}
+
+function renderWhy(){
+  stage.innerHTML='<div class="scene-content" style="flex-direction:row;align-items:center;gap:24px"><div class="mock-app fade-in"><div class="mock-label">RIDE BOOKED</div><div class="mock-avatar">'+faceSVG(74,74)+'</div><div class="mock-name">Alex M.</div><div class="mock-stars">★★★★☆</div><div class="mock-eta">Arriving in 3 min</div></div><div class="why-text slide-up"><p class="why-main">A driver\'s profile picture is the first thing a passenger sees when they book a ride. It builds trust and helps confirm they\'re getting into the right car.</p><p class="why-sub">That\'s why every profile picture needs to meet our standards before it goes live.</p></div></div>';
+}
+
+function renderChecklist(){
+  var items=["Same person as on DVLA, PHL, and PCO badge","Eyes open and fully visible","No sunglasses or reflections in glasses","No hair across the eyes, no face masks","No hat (unless for religious reasons)","Coloured photo, not black and white","Light background","Original photo (not a photo of a photo)"];
+  var html='<div class="scene-content"><div class="good-photo-area"><div class="fade-in" style="flex-shrink:0">'+faceSVG(120,150)+'</div><ul class="check-list">';
+  items.forEach(function(t){html+='<li><span class="check-icon">✓</span><span class="check-text">'+t+'</span></li>'});
+  html+='</ul></div></div>';
+  stage.innerHTML=html;
+}
+
+function badFaceSVG(type){
+  var bg=type==="bw"?"#999":type==="dark"?"#444":"#e8e8e8";
+  var s='<svg viewBox="0 0 100 130" width="96" height="125"><rect width="100" height="130" rx="6" fill="'+bg+'"/>';
+  var op=type==="blurry"?'opacity="0.4"':'';
+  s+='<g '+op+'><circle cx="50" cy="48" r="24" fill="'+(type==="bw"?"#aaa":"#d4a574")+'"/>';
+  if(type==="sunglasses"){
+    s+='<rect x="30" y="42" width="18" height="10" rx="3" fill="#111"/><rect x="52" y="42" width="18" height="10" rx="3" fill="#111"/><line x1="48" y1="47" x2="52" y2="47" stroke="#111" stroke-width="1.5"/>';
+  }else if(type==="mask"){
+    s+='<rect x="32" y="50" width="36" height="18" rx="4" fill="#cde"/>';
+  }else{
+    s+='<circle cx="42" cy="46" r="2.5" fill="#1a1a1a"/><circle cx="58" cy="46" r="2.5" fill="#1a1a1a"/>';
+  }
+  if(type!=="mask")s+='<path d="M42 58 Q50 63 58 58" fill="none" stroke="#1a1a1a" stroke-width="1.2"/>';
+  s+='</g>';
+  if(type==="scan")s+='<rect x="10" y="8" width="80" height="105" rx="2" fill="none" stroke="#999" stroke-width="1" stroke-dasharray="3 2"/>';
+  var labels={sunglasses:"Sunglasses",blurry:"Blurry",bw:"Black & white",mask:"Face mask",scan:"Photo of photo",dark:"Dark background"};
+  s+='<rect y="112" width="100" height="18" fill="rgba(0,0,0,0.6)"/><text x="50" y="124" text-anchor="middle" font-size="9" fill="#fff" font-weight="500">'+labels[type]+'</text></svg>';
+  return s;
+}
+
+function renderRejected(){
+  var types=["sunglasses","blurry","bw","mask","scan","dark"];
+  var html='<div class="scene-content"><p class="narration fade-in">These are the most common reasons a profile picture gets rejected.</p><div class="rejected-grid">';
+  types.forEach(function(t){html+='<div class="rejected-card">'+badFaceSVG(t)+'<div class="rejected-badge">✕</div></div>'});
+  html+='</div></div>';
+  stage.innerHTML=html;
+}
+
+function renderIdentity(){
+  var face='<svg viewBox="0 0 50 50" width="50" height="50"><circle cx="25" cy="22" r="12" fill="#d4a574"/><circle cx="22" cy="21" r="1.5" fill="#1a1a1a"/><circle cx="28" cy="21" r="1.5" fill="#1a1a1a"/></svg>';
+  stage.innerHTML='<div class="scene-content" style="align-items:center"><div class="warning-box fade-in"><div class="warning-icon">⚠</div><div class="warning-title">Critical: identity verification</div><p class="warning-text">Every time a driver submits a new photo, you must compare it with the previous picture on file to confirm it is the same person.</p><div class="compare-row" style="opacity:0"><div class="compare-item"><div class="compare-circle prev">'+face+'</div><span class="compare-label">Previous</span></div><div class="compare-arrow">↔</div><div class="compare-item"><div class="compare-circle new">'+face+'</div><span class="compare-label">New upload</span></div></div></div><div class="escalate-tag" style="opacity:0">If photos don\'t match → Escalate to Team Lead immediately</div></div>';
+}
+
+function renderProcess(){
+  stage.innerHTML='<div class="scene-content"><p class="narration fade-in">When a profile picture doesn\'t meet standards, follow this two-step process.</p><div class="step-row"><div class="step-num">1</div><div><div class="step-title">Set a future block</div><div class="step-desc">Starting in 1 week via Fleet & Car Application Block/Decline Generator → Profile picture (remote) – Quality</div></div></div><div class="step-row"><div class="step-num">2</div><div><div class="step-title">Email the driver via Infobip</div><div class="step-desc">Inform them the photo was declined. Include the standards: eyes visible, no sunglasses, no hair across eyes, no masks, light background, original photo.</div></div></div><div class="info-box">The driver gets a 1-week window to submit a compliant photo before their account is blocked.</div></div>';
+}
+
+function renderRecap(){
+  var items=["✓ Check quality standards","✓ Verify identity","✓ Block & notify if failed","⚠ When in doubt → escalate"];
+  var html='<div class="recap-bg">';
+  items.forEach(function(t){html+='<div class="recap-item">'+t+'</div>'});
+  html+='<div class="recap-footer">Questions? Reach out to your Team Lead.</div></div>';
+  stage.innerHTML=html;
+}
+
+init();
+</script>
+</body>
+</html>
